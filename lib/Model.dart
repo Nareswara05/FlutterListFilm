@@ -1,9 +1,9 @@
 class Movie {
-  late String title;
-  late String posterUrl;
-  late String genre;
-  late int rating;
-  late int releaseYear;
+  final String title;
+  final String posterUrl;
+  final String genre;
+  final double rating;
+  final int releaseYear;
 
   Movie({
     required this.title,

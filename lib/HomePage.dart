@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:day1/model.dart';
-import 'package:day1/HomePage.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:day1/Model.dart';
 
 void main() {
   runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Favorite Movies',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue),
       home: HomePage(),
-    );
+      debugShowCheckedModeBanner: false,
+      );
   }
 }
 
@@ -33,136 +33,128 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    Movie movie1 = Movie(
-      title: "Deadpool",
-      posterUrl: "https://cdns.klimg.com/resized/670x/g/f/o/foto_superhero_edan_poster_deadpool_ini_bikin_ngakak_abis/p/-20160210-009-rita.jpg",
-      genre: "Action",
-      rating: 4,
-      releaseYear: 2022,
-    );
-    Movie movie2 = Movie(
-      title: "Movie 2",
-      posterUrl: "https://cdns.klimg.com/resized/670x/g/f/o/foto_superhero_edan_poster_deadpool_ini_bikin_ngakak_abis/p/-20160210-009-rita.jpg",
-      genre: "Comedy",
-      rating: 5,
-      releaseYear: 2019,
-    );
-    Movie movie3 = Movie(
-      title: "Movie 2",
-      posterUrl: "https://cdns.klimg.com/resized/670x/g/f/o/foto_superhero_edan_poster_deadpool_ini_bikin_ngakak_abis/p/-20160210-009-rita.jpg",
-      genre: "Comedy",
-      rating: 5,
-      releaseYear: 2019,
-    );
-    Movie movie4 = Movie(
-      title: "Movie 2",
-      posterUrl: "https://cdns.klimg.com/resized/670x/g/f/o/foto_superhero_edan_poster_deadpool_ini_bikin_ngakak_abis/p/-20160210-009-rita.jpg",
-      genre: "Comedy",
-      rating: 5,
-      releaseYear: 2019,
-    );
-    Movie movie5 = Movie(
-      title: "Movie 2",
-      posterUrl: "https://cdns.klimg.com/resized/670x/g/f/o/foto_superhero_edan_poster_deadpool_ini_bikin_ngakak_abis/p/-20160210-009-rita.jpg",
-      genre: "Comedy",
-      rating: 5,
-      releaseYear: 2019,
-    );
-    Movie movie6 = Movie(
-      title: "Movie 2",
-      posterUrl: "https://cdns.klimg.com/resized/670x/g/f/o/foto_superhero_edan_poster_deadpool_ini_bikin_ngakak_abis/p/-20160210-009-rita.jpg",
-      genre: "Comedy",
-      rating: 5,
-      releaseYear: 2019,
-    );
-    Movie movie7 = Movie(
-      title: "Movie 2",
-      posterUrl: "https://cdns.klimg.com/resized/670x/g/f/o/foto_superhero_edan_poster_deadpool_ini_bikin_ngakak_abis/p/-20160210-009-rita.jpg",
-      genre: "Comedy",
-      rating: 3,
-      releaseYear: 2019,
-    );
-    Movie movie8 = Movie(
-      title: "Movie 2",
-      posterUrl: "https://cdns.klimg.com/resized/670x/g/f/o/foto_superhero_edan_poster_deadpool_ini_bikin_ngakak_abis/p/-20160210-009-rita.jpg",
-      genre: "Comedy",
-      rating: 5,
-      releaseYear: 2019,
-    );
+    fetchMovies().then((movies) {
+      setState(() {
+        favoriteMovies = movies;
+      });
+    });
+  }
 
+  Future<List<Movie>> fetchMovies() async {
+    final apiKey = '9acf91f77dc8d30eea3c27a21ecd43f3';
+    final url = Uri.https('api.themoviedb.org', '/3/movie/popular', {
+      'api_key': apiKey,
+    });
 
+    final response = await http.get(url);
 
-    favoriteMovies.add(movie1);
-    favoriteMovies.add(movie2);
-    favoriteMovies.add(movie3);
-    favoriteMovies.add(movie4);
-    favoriteMovies.add(movie5);
-    favoriteMovies.add(movie6);
-    favoriteMovies.add(movie7);
-    favoriteMovies.add(movie8);
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      final List<Movie> movies = [];
+      for (var movieData in data['results']) {
+        Movie movie = Movie(
+          title: movieData['title'],
+          posterUrl: 'https://image.tmdb.org/t/p/w500/${movieData['poster_path']}',
+          genre: getGenreNames(movieData['genre_ids']),
+          rating: movieData['vote_average'].toDouble(),
+          releaseYear: int.parse(movieData['release_date'].split('-')[0]),
+        );
+        movies.add(movie);
+      }
+      return movies;
+    } else {
+      throw Exception('Failed to load movies');
+    }
+  }
+
+  String getGenreNames(List<dynamic> genreIds) {
+    Map<int, String> genreMap = {
+      28: "Action",
+      35: "Comedy",
+      80: "Crime",
+      18: "Drama",
+      14: "Fantasy",
+      53: "Thriller",
+      10749: "Romance",
+      12: "Adventure",
+      27: "Horror",
+      878: "Science Fiction",
+      16: "Animation",
+      36: "History",
+      37: "Western",
+      10751: "Family",
+      9648: "Mystery",
+
+    };
+
+    List<String> genreNames = genreIds
+        .map((id) => genreMap[id] ?? 'Unknown')
+        .toList();
+
+    return genreNames.join(', ');
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+
+        body: SafeArea(
         child: Container(
-          color: Colors.black,
-          child: ListView.builder(
-            padding: const EdgeInsets.all(5),
-            itemCount: favoriteMovies.length,
-            itemBuilder: (BuildContext context, int index) {
-              return Container(
-                height: 140,
-                padding: EdgeInsets.all(10),
-                margin: EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-                decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow:[
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 2,
-                      )
-                    ]
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Image.network(
-                      favoriteMovies[index].posterUrl,
-                      width: 70,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    ),
-                    SizedBox(width: 15),
-                    Expanded(
+        color: Colors.black,
+        child: ListView.builder(
+        padding: const EdgeInsets.all(5),
+    itemCount: favoriteMovies.length,
+    itemBuilder: (BuildContext context, int index) {
+    return Container(
+              height: 160,
+              padding: EdgeInsets.all(5),
+              margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+              decoration: BoxDecoration(
+                color: Colors.black87,
+                borderRadius: BorderRadius.circular(10),
+                // boxShadow: [
+                //   BoxShadow(
+                //     color: Colors.grey.withOpacity(0.5),
+                //     spreadRadius: 2,
+                //   ),
+                // ],
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start, // Align contents to the top
+                children: [
+                  Image.network(
+                    favoriteMovies[index].posterUrl,
+                    width: 90,
+                    height: 150,
+                    fit: BoxFit.cover,
+                  ),
+                  SizedBox(width: 15),
+                  Expanded(
+                    child: IntrinsicHeight( // Wrap the Column with IntrinsicHeight
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
-                              child: Row(
-                            children: [
-                              Text(
-                                favoriteMovies[index].title,
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              SizedBox(width: 5),
-                              Text(
-                                "(${favoriteMovies[index].releaseYear.toString()})",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey[600],
-                                ),
-                              ),
-                            ],
-                          )),
+                          Text(
+                            favoriteMovies[index].title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            "(${favoriteMovies[index].releaseYear.toString()})",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                          SizedBox(height: 5),
                           Text(
                             "Genre: ${favoriteMovies[index].genre}",
                             style: TextStyle(
@@ -171,25 +163,32 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Row(
-                            children: List.generate(
-                              favoriteMovies[index].rating,
-                                  (ratingIndex) =>
-                                      Icon(
-                                          Icons.star,
-                                          color: Colors.orange
-                                      ),
-                            ),
+                            children: [
+                              Icon(
+                                Icons.star,
+                                color: Colors.orange,
+                              ),
+                              SizedBox(width: 5),
+                              Text(
+                                favoriteMovies[index].rating.toString(),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
+                  ),
+                ],
+              ),
+
+            );
+          },
         ),
       ),
-    );
+    ));
   }
 }
