@@ -1,4 +1,4 @@
-import 'package:day1/Login.dart';
+import 'package:Super_Cinemas/Login.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -6,13 +6,13 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key});
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+        title: 'Super Cinemas',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

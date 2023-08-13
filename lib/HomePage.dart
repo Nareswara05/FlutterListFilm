@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:day1/Model.dart';
+import 'package:Super_Cinemas/Model.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Favorite Movies',
+      title: 'Super Cinemas',
       theme: ThemeData(primarySwatch: Colors.blue),
       home: HomePage(),
       debugShowCheckedModeBanner: false,
@@ -23,12 +23,16 @@ class MyApp extends StatelessWidget {
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
+
+
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   late List<Movie> favoriteMovies = [];
+  bool isLoading = true;
+
 
   @override
   void initState() {
@@ -36,6 +40,7 @@ class _HomePageState extends State<HomePage> {
     fetchMovies().then((movies) {
       setState(() {
         favoriteMovies = movies;
+        isLoading = false;
       });
     });
   }
@@ -45,7 +50,7 @@ class _HomePageState extends State<HomePage> {
     final url = Uri.https('api.themoviedb.org', '/3/movie/popular', {
       'api_key': apiKey,
     });
-
+    await Future.delayed(Duration(seconds: 2));
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -101,11 +106,19 @@ class _HomePageState extends State<HomePage> {
         body: SafeArea(
         child: Container(
         color: Colors.black,
-        child: ListView.builder(
+            child: Stack(
+                children: [
+                // Show loading spinner if isLoading is true
+                if (isLoading)
+            Center(
+            child: CircularProgressIndicator(),
+        )
+        else
+          ListView.builder(
         padding: const EdgeInsets.all(5),
-    itemCount: favoriteMovies.length,
-    itemBuilder: (BuildContext context, int index) {
-    return Container(
+        itemCount: favoriteMovies.length,
+          itemBuilder: (BuildContext context, int index) {
+         return Container(
               height: 160,
               padding: EdgeInsets.all(5),
               margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
@@ -130,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   SizedBox(width: 15),
                   Expanded(
-                    child: IntrinsicHeight( // Wrap the Column with IntrinsicHeight
+                    child: IntrinsicHeight(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -188,7 +201,7 @@ class _HomePageState extends State<HomePage> {
             );
           },
         ),
-      ),
-    ));
+      ],
+    ))));
   }
 }

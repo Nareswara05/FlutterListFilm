@@ -1,4 +1,4 @@
-import 'package:day1/HomePage.dart';
+import 'package:Super_Cinemas/HomePage.dart';
 import 'package:flutter/material.dart';
 
 class LoginPage extends StatefulWidget {
@@ -14,12 +14,11 @@ class _LoginPageState extends State<LoginPage> {
       margin: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
       child: TextField(
         obscureText: isObsecure,
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.white), // Ganti warna font menjadi putih
         decoration: InputDecoration(
           border: OutlineInputBorder(),
           labelText: label,
-          labelStyle: TextStyle(color: Colors.white),
-
+          labelStyle: TextStyle(color: Colors.white), // Ganti warna label menjadi putih
         ),
       ),
     );
@@ -29,7 +28,6 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-
       body: Center(
         child: Container(
           padding: EdgeInsets.all(10),
@@ -53,9 +51,9 @@ class _LoginPageState extends State<LoginPage> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.red, // Ganti warna sesuai dengan Netflix
+                  primary: Colors.red,
                 ),
-                child: Text('Sign In'),
+                child: Text('Sign In', style: TextStyle(color: Colors.white)), // Ganti warna font menjadi putih
               ),
               SizedBox(height: 10),
               Text(
@@ -64,18 +62,13 @@ class _LoginPageState extends State<LoginPage> {
                 textAlign: TextAlign.center,
               ),
               SizedBox(height: 20),
-              Text(
-                'New to Netflix? Sign up now.',
-                style: TextStyle(color: Colors.white),
-                textAlign: TextAlign.center,
-              ),
               SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () {},
                 style: ElevatedButton.styleFrom(
                   primary: Colors.grey[900], // Ganti warna sesuai dengan Netflix
                 ),
-                child: Text('Sign Up'),
+                child: Text('Sign Up', style: TextStyle(color: Colors.purple)), // Ganti warna font menjadi ungu
               ),
             ],
           ),
